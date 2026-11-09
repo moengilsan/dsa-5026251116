@@ -1,100 +1,64 @@
-package lw03.prelab.guided;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
-import java.util.*;
+public class Main {
+    public static void main(String[] args) throws FileNotFoundException {
+        Scanner input = new Scanner(new File("branches.txt"));
 
-public class main {
-    public static void main(String[] args) {
-        Scanner sc1 = new Scanner(main.class.getResourceAsStream("playlist.txt"));
-        List<String> playList = new ArrayList<>();
-        while (sc1.hasNextLine()) {
-            String line = sc1.nextLine();
-            String operation = line.substring(0, line.indexOf(" "));
-            String details = line.substring(line.indexOf(" ") + 1);
+        int n = input.nextInt();
+        int[] branches = new int[n];
 
-            if (operation.equals("ADD")) {
-                String song = details;
-                playList.add(song);
-            } else if (operation.equals("INSERT")) {
-                int index = Integer.parseInt(details.substring(0, details.indexOf(" ")));
-                String song = details.substring(details.indexOf(" ") + 1);
-                playList.add(index, song);
-            } else {
-                String song = details;
-                if (playList.contains(song)) {
-                    playList.remove(song);
-                }
-            }
+        for (int i = 0; i < n; i++) {
+            branches[i] = input.nextInt();
         }
 
-        System.out.println("===== Problem 1 =====");
-        System.out.println("Total: " + playList.size());
-        int number = 1;
-        for(String p: playList) {
-            System.out.println(number + ": " + p);
-            number++;
+        int m = input.nextInt();
+        int[] targets = new int[m];
+
+        for (int i = 0; i < m; i++) {
+            targets[i] = input.nextInt();
+        }
+
+        input.close();
+
+        for (int i = 1; i <= 3; i++) {
+            int key = branches[i];
+            int j = i - 1;
+
+            while (j >= 0 && branches[j] < key) {
+                branches[j + 1] = branches[j];
+                j--;
+            }
+
+            branches[j + 1] = key;
+        }
+
+        for (int i = 0; i < n; i++) {
+            if (i > 0) {
+                System.out.print(" ");
+            }
+
+            System.out.print(branches[i]);
         }
 
         System.out.println();
-        
-        Scanner sc2 = new Scanner(main.class.getResourceAsStream("participants.txt"));
-        Set<String> students = new LinkedHashSet<>();
-        int duplicate = 0;
 
-        while (sc2.hasNextLine()) {
-            String name = sc2.nextLine();
-            if (students.contains(name)) {
-                duplicate++;
-            }
-            students.add(name);
-        }
+        for (int target : targets) {
+            int index = -1;
 
-        System.out.println("===== Problem 2 =====");
-        System.out.println("Unique participants:" + students.size());
-        int no = 1;
-        for (String s : students) {
-            System.out.println(no + ". " + s);
-            no++;
-        }
-        System.out.println("Duplicate registrations: " + duplicate);
-
-        System.out.println();
-
-        Scanner sc3 = new Scanner(main.class.getResourceAsStream("inventory.txt"));
-        Map<String, Integer> products = new LinkedHashMap<>();
-        int failedTrx = 0;
-
-        while(sc3.hasNextLine()) {
-            String line = sc3.nextLine();
-            String[] parts = line.split(" ");
-
-            String type = parts[0];
-            String product = parts[1];
-            int qty = Integer.parseInt(parts[2]);
-
-            if (type.equals("ADD")) {
-                if (products.containsKey(product)) {
-                    int currentStock = products.get(product);
-                    products.put(product, currentStock + qty);
-                } else {
-                    products.put(product, qty);
+            for (int i = 0; i < n; i++) {
+                if (branches[i] == target) {
+                    index = i;
+                    break;
                 }
+            }
+
+            if (index == -1) {
+                System.out.println(target + ": NOT FOUND");
             } else {
-                if (products.containsKey(product) && products.get(product) >= qty){
-                    int currentStock = products.get(product);
-                    products.put(product, currentStock - qty);
-                } else {
-                    failedTrx++;
-                }
+                System.out.println(target + ": FOUND at index " + index);
             }
         }
-
-        System.out.println("===== Problem 3 =====");
-        for (String p : products.keySet()) {
-            System.out.println(p + ": " + products.get(p));
-        }
-        System.out.println("Failed sales: " + failedTrx);
     }
 }
-
-
-
